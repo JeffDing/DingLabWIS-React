@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
@@ -17,8 +17,7 @@ import ChangePassword from './pages/ChangePassword'
 
 import { isAdminLoggedIn } from './utils/auth'
 
-import defaultNavData from './data/defaultNav.json'
-import type { NavItem } from './types/nav'
+
 import './App.css'
 
 /**
@@ -56,7 +55,7 @@ function MainLayout() {
       <div className="main-body">
         <Sidebar
           onNavigate={handleNavigate}
-          navData={defaultNavData as NavItem[]}
+
           onToggleSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           isCollapsed={sidebarCollapsed}
         />
@@ -70,7 +69,7 @@ function MainLayout() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="app-container">
         <Routes>
           <Route path="/" element={<MainLayout />} />
@@ -94,7 +93,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 

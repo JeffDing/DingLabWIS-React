@@ -145,9 +145,6 @@ function sha256Fallback(message: string): string {
   return hex
 }
 
-function rotr(x: number, n: number): number {
-  return (x >>> n) | (x << (32 - n))
-}
 
 /**
  * 验证输入密码是否与存储的哈希值匹配

@@ -20,10 +20,11 @@ const STORAGE_KEY = 'sidebarNavData'
 function Sidebar({ onNavigate, navData: propNavData, onToggleSidebar, isCollapsed }: SidebarProps) {
   const [navItems, setNavItems] = useState<NavItem[]>([])
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
+  const hasPropNavData = !!propNavData
 
   // 从 localStorage 或 defaultNav.json 加载导航数据
   useEffect(() => {
-    if (propNavData) {
+    if (hasPropNavData) {
       setNavItems(propNavData)
       return
     }
@@ -40,7 +41,43 @@ function Sidebar({ onNavigate, navData: propNavData, onToggleSidebar, isCollapse
       // localStorage 不可用或数据解析失败时回退到默认数据
       setNavItems(defaultNavData as NavItem[])
     }
-  }, [propNavData])
+  }, [hasPropNavData, propNavData])
+
+  // 监听 localStorage 变化，实现管理后台修改后前台实时生效
+  useEffect(() => {
+    if (hasPropNavData) return
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue) as NavItem[]
+          setNavItems(parsed)
+        } catch {
+          // 解析失败时保持现有数据
+        }
+      }
+    }
+
+    const handleCustomUpdate = () => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (stored) {
+          const parsed = JSON.parse(stored) as NavItem[]
+          setNavItems(parsed)
+        }
+      } catch {
+        // 解析失败时保持现有数据
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('navDataUpdated', handleCustomUpdate)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('navDataUpdated', handleCustomUpdate)
+    }
+  }, [hasPropNavData])
 
   // 初始化时默认展开所有分类
   useEffect(() => {

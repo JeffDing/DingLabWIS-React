@@ -32,6 +32,7 @@ export function getNavData(): NavItem[] {
 export function saveNavData(data: NavItem[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    window.dispatchEvent(new CustomEvent('navDataUpdated'))
   } catch {
     // localStorage 不可用时静默失败
   }
