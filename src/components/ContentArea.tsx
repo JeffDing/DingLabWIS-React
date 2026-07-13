@@ -5,7 +5,7 @@ interface ContentAreaProps {
   src?: string
 }
 
-function ContentArea({ src = '/gx.html' }: ContentAreaProps) {
+function ContentArea({ src = 'gx.html' }: ContentAreaProps) {
   const [currentSrc, setCurrentSrc] = useState<string>(src)
 
   useEffect(() => {

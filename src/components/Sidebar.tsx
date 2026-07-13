@@ -79,20 +79,7 @@ function Sidebar({ onNavigate, navData: propNavData, onToggleSidebar, isCollapse
     }
   }, [hasPropNavData])
 
-  // 初始化时默认展开所有分类
-  useEffect(() => {
-    if (navItems.length > 0) {
-      setExpandedIds((prev) => {
-        const next = new Set(prev)
-        navItems.forEach((item) => {
-          if (item.type === 'category' && item.children && item.children.length > 0) {
-            next.add(item.id)
-          }
-        })
-        return next
-      })
-    }
-  }, [navItems])
+
 
   // 切换分类展开/折叠状态
   const toggleExpand = useCallback((id: string) => {

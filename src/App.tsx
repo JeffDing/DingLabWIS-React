@@ -42,9 +42,8 @@ function MainLayout() {
     } else if (target === '_self') {
       window.location.href = url
     } else if (target === 'main') {
-      // 将相对路径转换为绝对路径，避免在子路由下解析错误
-      const absoluteUrl = url.startsWith('./') ? '/' + url.slice(2) : url
-      const event = new CustomEvent('navigate', { detail: { url: absoluteUrl } })
+      // 直接传递 URL，由浏览器根据当前页面地址解析相对路径
+      const event = new CustomEvent('navigate', { detail: { url } })
       window.dispatchEvent(event)
     }
   }
@@ -60,7 +59,7 @@ function MainLayout() {
           isCollapsed={sidebarCollapsed}
         />
         <div className="content-wrapper">
-          <ContentArea src="/gx.html" />
+          <ContentArea src="gx.html" />
         </div>
       </div>
     </>
