@@ -2,6 +2,8 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import { navDataApiPlugin } from './vite.plugins/navDataApi'
 
 /**
  * Vite 插件：防止 public 目录中不存在的 HTML 文件触发 SPA fallback
@@ -29,9 +31,14 @@ function preventSpaFallbackForMissingHtml(): Plugin {
   }
 }
 
+// 导航数据持久化文件路径（与 defaultNav.json 同目录）
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const navDataFilePath = path.resolve(__dirname, 'src/data/navData.json')
+
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), preventSpaFallbackForMissingHtml()],
+  plugins: [react(), preventSpaFallbackForMissingHtml(), navDataApiPlugin(navDataFilePath)],
   base: './',
   server: {
     port: 5173,

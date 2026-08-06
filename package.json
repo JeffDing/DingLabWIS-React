@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync-wap": "node scripts/sync-wap-html.mjs"
   },
   "dependencies": {
     "react": "^18.2.0",

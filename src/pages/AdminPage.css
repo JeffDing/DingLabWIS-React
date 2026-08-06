@@ -3,19 +3,24 @@
  */
 
 .admin-page {
-  min-height: 100vh;
+  height: 100vh;
   background-color: #cce8cf;
   padding: 24px 16px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .admin-container {
   max-width: 1200px;
+  height: 100%;
   margin: 0 auto;
   background: #ffffff;
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .admin-header {
@@ -46,6 +51,13 @@
   padding: 10px 16px;
   border-radius: 8px;
   margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.admin-loading {
+  padding: 40px 16px;
+  text-align: center;
+  color: #888888;
   font-size: 14px;
 }
 
@@ -193,6 +205,9 @@
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid #eeeeee;
+  background: #ffffff;
 }
 
 /* 通用按钮样式 */
@@ -248,6 +263,30 @@
 .admin-btn-toggle:hover {
   background-color: #f5f5f5;
   border-color: #b0b0b0;
+}
+
+/* 移动顺序按钮 */
+.admin-btn-move {
+  background-color: #ffffff;
+  color: #1976d2;
+  border: 1px solid #90caf9;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 32px;
+}
+
+.admin-btn-move:hover:not(:disabled) {
+  background-color: #e3f2fd;
+  border-color: #1976d2;
+}
+
+.admin-btn-move:disabled {
+  color: #bdbdbd;
+  border-color: #e0e0e0;
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* 添加子项按钮 */
@@ -311,8 +350,8 @@
   }
 
   .admin-header {
-    flex-direction: column;
-    align-items: flex-start;
+    /* 保持 row + wrap，避免窄屏下 header 占用过高把 content 压没 */
+    align-items: center;
   }
 
   .admin-header h1 {
@@ -320,24 +359,19 @@
   }
 
   .category-header {
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .category-actions {
-    width: 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 
   .child-item {
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .child-info {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    gap: 6px;
   }
 
   .child-url {
@@ -345,8 +379,12 @@
   }
 
   .child-actions {
-    width: 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
+  }
+
+  .admin-footer {
+    padding-top: 10px;
+    margin-top: 12px;
   }
 }
 

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import type { NavItem } from '../types/nav'
-import defaultNavData from '../data/defaultNav.json'
+import { fetchNavData } from '../utils/navigationData'
 import './Sidebar.css'
 
 interface SidebarProps {
@@ -15,67 +15,45 @@ interface SidebarProps {
   isCollapsed?: boolean
 }
 
-const STORAGE_KEY = 'sidebarNavData'
-
 function Sidebar({ onNavigate, navData: propNavData, onToggleSidebar, isCollapsed }: SidebarProps) {
   const [navItems, setNavItems] = useState<NavItem[]>([])
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const hasPropNavData = !!propNavData
 
-  // 从 localStorage 或 defaultNav.json 加载导航数据
+  // 从文件式数据库（或回退 localStorage）加载导航数据
   useEffect(() => {
     if (hasPropNavData) {
       setNavItems(propNavData)
       return
     }
 
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        const parsed = JSON.parse(stored) as NavItem[]
-        setNavItems(parsed)
-      } else {
-        setNavItems(defaultNavData as NavItem[])
-      }
-    } catch {
-      // localStorage 不可用或数据解析失败时回退到默认数据
-      setNavItems(defaultNavData as NavItem[])
+    let cancelled = false
+    fetchNavData().then((data) => {
+      if (!cancelled) setNavItems(data)
+    })
+    return () => {
+      cancelled = true
     }
   }, [hasPropNavData, propNavData])
 
-  // 监听 localStorage 变化，实现管理后台修改后前台实时生效
+  // 监听数据更新事件，重新拉取最新数据
   useEffect(() => {
     if (hasPropNavData) return
 
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY && e.newValue) {
-        try {
-          const parsed = JSON.parse(e.newValue) as NavItem[]
-          setNavItems(parsed)
-        } catch {
-          // 解析失败时保持现有数据
-        }
-      }
+    const handleUpdate = () => {
+      fetchNavData().then((data) => setNavItems(data))
     }
 
-    const handleCustomUpdate = () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          const parsed = JSON.parse(stored) as NavItem[]
-          setNavItems(parsed)
-        }
-      } catch {
-        // 解析失败时保持现有数据
-      }
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'sidebarNavData') handleUpdate()
     }
 
     window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('navDataUpdated', handleCustomUpdate)
+    window.addEventListener('navDataUpdated', handleUpdate)
 
     return () => {
       window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('navDataUpdated', handleCustomUpdate)
+      window.removeEventListener('navDataUpdated', handleUpdate)
     }
   }, [hasPropNavData])
 

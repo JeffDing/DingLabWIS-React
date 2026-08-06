@@ -8,7 +8,7 @@ import { Navigate } from 'react-router-dom'
 import { isAdminLoggedIn, adminLogout } from '../utils/auth'
 import type { NavItem } from '../types/nav'
 import {
-  getNavData,
+  fetchNavData,
   saveNavData,
   resetToDefault,
   addCategory,
@@ -17,7 +17,8 @@ import {
   addChildToCategory,
   updateChildItem,
   deleteChildItem,
-
+  moveCategory,
+  moveChildItem,
 } from '../utils/navigationData'
 import './AdminPage.css'
 
@@ -30,10 +31,20 @@ function AdminPage() {
   const [navItems, setNavItems] = useState<NavItem[]>([])
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set())
   const [message, setMessage] = useState<string>('')
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  // 加载导航数据
+  // 加载导航数据（优先文件式数据库，回退 localStorage）
   useEffect(() => {
-    setNavItems(getNavData())
+    let cancelled = false
+    fetchNavData().then((data) => {
+      if (!cancelled) {
+        setNavItems(data)
+        setIsLoading(false)
+      }
+    })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   // 显示提示消息
@@ -163,6 +174,18 @@ function AdminPage() {
     }
   }
 
+  // 移动分类顺序
+  const handleMoveCategory = (categoryId: string, direction: 'up' | 'down') => {
+    const newItems = moveCategory(navItems, categoryId, direction)
+    setNavItems(newItems)
+  }
+
+  // 移动子项顺序
+  const handleMoveChild = (childId: string, direction: 'up' | 'down') => {
+    const newItems = moveChildItem(navItems, childId, direction)
+    setNavItems(newItems)
+  }
+
   // 重置为默认
   const handleResetToDefault = () => {
     if (confirm('确定重置为默认导航数据吗？所有自定义修改将被丢失。')) {
@@ -199,12 +222,17 @@ function AdminPage() {
 
         {message && <div className="admin-message">{message}</div>}
 
+        {isLoading ? (
+          <div className="admin-loading">加载中...</div>
+        ) : (
         <div className="admin-content">
-          {sortedItems.map((item) => {
+          {sortedItems.map((item, index) => {
             if (item.type !== 'category') return null
 
             const isExpanded = expandedIds.has(item.id)
             const children = item.children || []
+            const isFirstCategory = index === 0
+            const isLastCategory = index === sortedItems.length - 1
 
             return (
               <div key={item.id} className="category-card">
@@ -228,6 +256,22 @@ function AdminPage() {
                     <span className="category-count">({children.length})</span>
                   </div>
                   <div className="category-actions">
+                    <button
+                      onClick={() => handleMoveCategory(item.id, 'up')}
+                      className="admin-btn admin-btn-small admin-btn-move"
+                      disabled={isFirstCategory}
+                      title="上移"
+                    >
+                      ↑
+                    </button>
+                    <button
+                      onClick={() => handleMoveCategory(item.id, 'down')}
+                      className="admin-btn admin-btn-small admin-btn-move"
+                      disabled={isLastCategory}
+                      title="下移"
+                    >
+                      ↓
+                    </button>
                     <button
                       onClick={() => handleUpdateCategoryName(item.id, item.name)}
                       className="admin-btn admin-btn-edit"
@@ -257,7 +301,7 @@ function AdminPage() {
                       ) : (
                         children
                           .sort((a, b) => a.order - b.order)
-                          .map((child) => (
+                          .map((child, childIndex) => (
                             <div key={child.id} className="child-item">
                               <div className="child-info">
                                 <span className="child-name">{child.name}</span>
@@ -266,6 +310,22 @@ function AdminPage() {
                                 <span className="child-target">target: {child.target}</span>
                               </div>
                               <div className="child-actions">
+                                <button
+                                  onClick={() => handleMoveChild(child.id, 'up')}
+                                  className="admin-btn admin-btn-small admin-btn-move"
+                                  disabled={childIndex === 0}
+                                  title="上移"
+                                >
+                                  ↑
+                                </button>
+                                <button
+                                  onClick={() => handleMoveChild(child.id, 'down')}
+                                  className="admin-btn admin-btn-small admin-btn-move"
+                                  disabled={childIndex === children.length - 1}
+                                  title="下移"
+                                >
+                                  ↓
+                                </button>
                                 <button
                                   onClick={() => handleUpdateChild(child.id, 'name', child.name)}
                                   className="admin-btn admin-btn-small admin-btn-edit"
@@ -313,6 +373,7 @@ function AdminPage() {
             )
           })}
         </div>
+        )}
 
         <div className="admin-footer">
           <button onClick={handleAddCategory} className="admin-btn admin-btn-add-category">

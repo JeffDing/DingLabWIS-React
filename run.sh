@@ -41,9 +41,18 @@ else
     echo "依赖已存在，跳过安装步骤。"
 fi
 
+# 确保导航数据文件存在（文件式数据库）
+if [ ! -f "src/data/navData.json" ]; then
+    echo ""
+    echo "检测到 navData.json 不存在，从默认数据初始化..."
+    cp src/data/defaultNav.json src/data/navData.json
+    echo "已创建 src/data/navData.json"
+fi
+
 echo ""
 echo "正在启动开发服务器..."
 echo "项目地址：http://localhost:5173"
+echo "后台管理：http://localhost:5173/#/admin-login （默认密码 dinglab2026）"
 echo "按 Ctrl+C 可停止服务器"
 echo ""
 echo "=========================================="

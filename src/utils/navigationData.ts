@@ -1,15 +1,21 @@
 /**
  * 导航数据模块
- * 提供导航数据的读取、写入、CRUD 操作及 localStorage 持久化
+ * 提供导航数据的读取、写入、CRUD 操作及持久化
+ *
+ * 持久化策略（双模式）：
+ * 1. 优先使用文件式数据库（通过 /api/nav-data 由 Vite 插件读写 src/data/navData.json）
+ * 2. API 不可用时（静态托管）回退到 localStorage
+ * 3. 始终双写 localStorage，保证前台实时生效与离线可用
  */
 
 import type { NavItem } from '../types/nav'
 import defaultNavData from '../data/defaultNav.json'
 
 const STORAGE_KEY = 'sidebarNavData'
+const API_URL = '/api/nav-data'
 
 /**
- * 从 localStorage 或默认数据加载导航数据
+ * 从 localStorage 或默认数据加载导航数据（同步，供初次渲染快速显示）
  * @returns NavItem[] 导航数据数组
  */
 export function getNavData(): NavItem[] {
@@ -26,15 +32,59 @@ export function getNavData(): NavItem[] {
 }
 
 /**
- * 保存导航数据到 localStorage
+ * 异步加载导航数据：优先 GET API，失败回退 localStorage/defaultNav
+ * @returns NavItem[] 导航数据数组
+ */
+export async function fetchNavData(): Promise<NavItem[]> {
+  try {
+    const res = await fetch(API_URL, { method: 'GET' })
+    if (res.ok) {
+      const data = (await res.json()) as NavItem[]
+      // 双写 localStorage，保证前台其他组件同步可见
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+      } catch {
+        // localStorage 不可用时忽略
+      }
+      return data
+    }
+  } catch {
+    // API 不可用（静态托管），回退到 localStorage
+  }
+  return getNavData()
+}
+
+/**
+ * 保存导航数据：同步写 localStorage + 派发事件，并异步 POST API（不阻塞）
  * @param data 导航数据数组
  */
 export function saveNavData(data: NavItem[]): void {
+  // 同步写 localStorage 并派发事件，保证前台实时生效
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
     window.dispatchEvent(new CustomEvent('navDataUpdated'))
   } catch {
     // localStorage 不可用时静默失败
+  }
+  // 异步写文件式数据库（失败不影响前端）
+  void persistToApi(data)
+}
+
+/**
+ * 异步持久化到文件式数据库（POST API）
+ * @param data 导航数据数组
+ * @returns boolean 是否成功
+ */
+export async function persistToApi(data: NavItem[]): Promise<boolean> {
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+    return res.ok
+  } catch {
+    return false
   }
 }
 
@@ -101,7 +151,6 @@ export function addCategory(items: NavItem[], name: string): NavItem[] {
  */
 export function deleteCategory(items: NavItem[], categoryId: string): NavItem[] {
   const newItems = items.filter((item) => item.id !== categoryId)
-  // 递归清理所有子项（filter 已经移除了整个分类，但为了保险起见保持逻辑清晰）
   saveNavData(newItems)
   return newItems
 }
@@ -200,6 +249,80 @@ export function deleteChildItem(items: NavItem[], childId: string): NavItem[] {
       ...item,
       children: item.children.filter((child) => child.id !== childId),
     }
+  })
+
+  saveNavData(newItems)
+  return newItems
+}
+
+/**
+ * 移动顶级分类顺序（与相邻分类交换 order）
+ * @param items 当前导航数据数组
+ * @param categoryId 要移动的分类 ID
+ * @param direction 'up' 上移 | 'down' 下移
+ * @returns 新的导航数据数组
+ */
+export function moveCategory(
+  items: NavItem[],
+  categoryId: string,
+  direction: 'up' | 'down',
+): NavItem[] {
+  const sorted = [...items].sort((a, b) => a.order - b.order)
+  const index = sorted.findIndex((item) => item.id === categoryId)
+  if (index === -1) return items
+
+  const swapIndex = direction === 'up' ? index - 1 : index + 1
+  if (swapIndex < 0 || swapIndex >= sorted.length) return items
+
+  const current = sorted[index]
+  const target = sorted[swapIndex]
+  const currentOrder = current.order
+  const targetOrder = target.order
+
+  const newItems = items.map((item) => {
+    if (item.id === current.id) return { ...item, order: targetOrder }
+    if (item.id === target.id) return { ...item, order: currentOrder }
+    return item
+  })
+
+  saveNavData(newItems)
+  return newItems
+}
+
+/**
+ * 移动分类内子项顺序（与相邻子项交换 order）
+ * @param items 当前导航数据数组
+ * @param childId 要移动的子项 ID
+ * @param direction 'up' 上移 | 'down' 下移
+ * @returns 新的导航数据数组
+ */
+export function moveChildItem(
+  items: NavItem[],
+  childId: string,
+  direction: 'up' | 'down',
+): NavItem[] {
+  const newItems = items.map((item) => {
+    if (item.type !== 'category' || !item.children) return item
+
+    const sortedChildren = [...item.children].sort((a, b) => a.order - b.order)
+    const index = sortedChildren.findIndex((child) => child.id === childId)
+    if (index === -1) return item
+
+    const swapIndex = direction === 'up' ? index - 1 : index + 1
+    if (swapIndex < 0 || swapIndex >= sortedChildren.length) return item
+
+    const current = sortedChildren[index]
+    const target = sortedChildren[swapIndex]
+    const currentOrder = current.order
+    const targetOrder = target.order
+
+    const newChildren = item.children.map((child) => {
+      if (child.id === current.id) return { ...child, order: targetOrder }
+      if (child.id === target.id) return { ...child, order: currentOrder }
+      return child
+    })
+
+    return { ...item, children: newChildren }
   })
 
   saveNavData(newItems)
