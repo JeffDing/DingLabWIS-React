@@ -766,6 +766,15 @@
         "target": "_blank",
         "parentId": "menu13",
         "order": 15
+      },
+      {
+        "id": "menu13-16",
+        "name": "华南气象爱好者",
+        "type": "link",
+        "url": "https://www.smca.fun/",
+        "target": "_blank",
+        "parentId": "menu13",
+        "order": 16
       }
     ]
   },
