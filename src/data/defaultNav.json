@@ -759,22 +759,13 @@
         "order": 14
       },
       {
-        "id": "menu13-15",
-        "name": "智台智能体",
-        "type": "link",
-        "url": "http://smartyphoon.ap-tcrc.org",
-        "target": "_blank",
-        "parentId": "menu13",
-        "order": 15
-      },
-      {
         "id": "menu13-16",
         "name": "华南气象爱好者",
         "type": "link",
         "url": "https://www.smca.fun/",
         "target": "_blank",
         "parentId": "menu13",
-        "order": 16
+        "order": 15
       }
     ]
   },
@@ -867,10 +858,90 @@
     ]
   },
   {
+    "id": "nav_1786015418227_z17ykvn",
+    "name": "健茂天气",
+    "type": "category",
+    "order": 16,
+    "children": [
+      {
+        "name": "主页",
+        "url": "https://jm.typhoon.vip/",
+        "target": "_blank",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015456938_uf020jh",
+        "order": 1
+      },
+      {
+        "name": "FNV3",
+        "url": "https://jm.typhoon.vip/fnv3/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015472091_yxxt6x8",
+        "order": 2
+      },
+      {
+        "name": "GENC",
+        "url": "https://jm.typhoon.vip/genc/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015492722_yndka4n",
+        "order": 3
+      },
+      {
+        "name": "EC",
+        "url": "https://jm.typhoon.vip/ecmwf/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015509322_vjjmpjb",
+        "order": 4
+      },
+      {
+        "name": "AIFS",
+        "url": "https://jm.typhoon.vip/aifs/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015535649_mx7uboi",
+        "order": 5
+      },
+      {
+        "name": "GEFS",
+        "url": "https://jm.typhoon.vip/gfs/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015561626_hfqqbbt",
+        "order": 6
+      },
+      {
+        "name": "AIGEFS",
+        "url": "https://jm.typhoon.vip/aigfs/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015582785_g3e1rcw",
+        "order": 7
+      },
+      {
+        "name": "模式集合",
+        "url": "https://jm.typhoon.vip/typhoon-model/img/?from=map",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786015418227_z17ykvn",
+        "id": "nav_1786015611058_clvgg5t",
+        "order": 8
+      }
+    ]
+  },
+  {
     "id": "menu16",
     "name": "上海气象",
     "type": "category",
-    "order": 16,
+    "order": 17,
     "children": [
       {
         "id": "menu16-1",
@@ -929,10 +1000,54 @@
     ]
   },
   {
+    "id": "nav_1786323419154_i5aicbb",
+    "name": "上海防汛",
+    "type": "category",
+    "order": 18,
+    "children": [
+      {
+        "name": "防汛防台",
+        "url": "https://swj.sh.gov.cn/swj-fxftzt/index.html",
+        "target": "_blank",
+        "type": "link",
+        "parentId": "nav_1786323419154_i5aicbb",
+        "id": "nav_1786323616641_5ihlg3v",
+        "order": 1
+      },
+      {
+        "name": "实时雨量",
+        "url": "https://bmxx.swj.sh.gov.cn/zwwx/#/yuliangall",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786323419154_i5aicbb",
+        "id": "nav_1786323511938_52dmboi",
+        "order": 2
+      },
+      {
+        "name": "道路积水",
+        "url": "https://bmxx.swj.sh.gov.cn/zwwx/#/jishuiall",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786323419154_i5aicbb",
+        "id": "nav_1786323530106_lqgwnh3",
+        "order": 3
+      },
+      {
+        "name": "风速风向",
+        "url": "https://bmxx.swj.sh.gov.cn/zwwx/#/fengsu",
+        "target": "main",
+        "type": "link",
+        "parentId": "nav_1786323419154_i5aicbb",
+        "id": "nav_1786323553289_abv3mcb",
+        "order": 4
+      }
+    ]
+  },
+  {
     "id": "menu17",
     "name": "港澳台气象",
     "type": "category",
-    "order": 17,
+    "order": 19,
     "children": [
       {
         "id": "menu17-1",
@@ -967,7 +1082,7 @@
     "id": "menu18",
     "name": "美国气象",
     "type": "category",
-    "order": 18,
+    "order": 20,
     "children": [
       {
         "id": "menu18-1",
@@ -1173,7 +1288,7 @@
     "id": "menu19",
     "name": "世界气象",
     "type": "category",
-    "order": 19,
+    "order": 21,
     "children": [
       {
         "id": "menu19-1",
@@ -1271,7 +1386,7 @@
     "id": "menu20",
     "name": "台风年鉴",
     "type": "category",
-    "order": 20,
+    "order": 22,
     "children": [
       {
         "id": "menu20-1",
@@ -1324,7 +1439,7 @@
     "id": "menu21",
     "name": "版本切换",
     "type": "category",
-    "order": 21,
+    "order": 23,
     "children": [
       {
         "id": "menu21-1",
